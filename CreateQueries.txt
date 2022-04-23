@@ -1,0 +1,258 @@
+CREATE TABLE Procedures (
+    Procedure_ID INT NOT NULL PRIMARY KEY,
+    ProcedureName VARCHAR(50),
+    MedRecord_ID INT NOT NULL,
+    Medical_ID INT NOT NULL,
+    Charge INT,
+    Required_License_Type VARCHAR(50),
+    Invoice_ID INT NOT NULL,
+    FOREIGN KEY(MedRecord_ID) REFERENCES     medRecord(MedRecord_ID),
+    FOREIGN KEY(Medical_ID) REFERENCES Medical(med_ID),
+    FOREIGN KEY(Invoice_ID) REFERENCES Invoice(Invoice_ID)
+);
+
+CREATE TABLE INSURANCE (
+Insurance_ID INTEGER NOT NULL PRIMARY KEY,
+Name VARCHAR(255) NOT NULL,
+Policy_Number INT NOT NULL,
+Group_Number INT NOT NULL
+);
+
+CREATE TABLE PROCEDURE_CHARGES(
+	Insurance_ID INTEGER NOT NULL,
+	ProcedureName Text NOT NULL,
+ChargeToPatient INT NOT NULL,
+PRIMARY KEY(Insurance_ID , ProcedureName),
+FOREIGN KEY (Insurance_ID) REFERENCES Insurance(Insurance_ID),
+FOREIGN KEY (ProcedureName) REFERENCES Procedure(ProcedureName)
+);
+
+CREATE TABLE APPOINTMENT_INVOICES (
+	Appointment_ID INT NOT NULL,
+	Invoice_ID INT NOT NULL,
+PRIMARY KEY(appointment_ID, Invoice_ID),
+FOREIGN KEY(appointment_ID) REFERENCES Appointment(appointment_ID),
+FOREIGN KEY(Invoice_ID ) REFERENCES Invoice(Invoice_ID)
+);
+	
+CREATE TABLE APPOINTMENT (
+appointment_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+appointment_Date DATE NOT NULL,
+patient_ID INT NOT NULL,
+medical_ID INT NOT NULL,
+Cancellation BOOLEAN,
+Location_ID VARCHAR(255) NOT NULL,
+FOREIGN KEY(Location_ID) REFERENCES Location(Location_ID),
+FOREIGN KEY(patient_ID) REFERENCES Patient(patient_ID),
+FOREIGN KEY(medical_ID) REFERENCES Medical(medical_ID)
+);
+
+CREATE TABLE LOCATION (
+Location_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+addr_ID INT NOT NULL,
+Phone VARCHAR(12) NOT NULL,
+Name VARCHAR(255) NOT NULL,
+FOREIGN KEY(addr_ID) REFERENCES Address(addr_ID)
+);
+
+
+CREATE TABLE ADDRESS (
+addr_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+Street VARCHAR(255) NOT NULL,
+Apartment VARCHAR(255),
+City VARCHAR(255) NOT NULL,
+State VARCHAR(255) NOT NULL,
+ZIP VARCHAR(255) NOT NULL,
+Country VARCHAR(255) NOT NULL
+);
+
+
+CREATE TABLE INVOICE (
+invoice_ID  INTEGER PRIMARY KEY AUTOINCREMENT,
+Charge INT NOT NULL,
+Paid int,
+patient_ID INT NOT NULL,
+FOREIGN KEY(patient_ID) REFERENCES Patient(patient_ID)
+);
+
+CREATE TABLE PAYMENT_INFO (
+	payInfo_ID INT NOT NULL PRIMARY KEY,
+	Type VARCHAR(10) NOT NULL
+);
+
+CREATE TABLE CARD_PAYMENT (
+	cardPaymentId INT NOT NULL PRIMARY KEY,
+  payInfo_ID INT NOT NULL,
+	card_Number VARCHAR(16) NOT NULL,
+	cvv INT NOT NULL,
+	expiration_date DATE NOT NULL,
+	name_on_card VARCHAR(30) NOT NULL,
+	addr_ID INT NOT NULL,
+  FOREIGN KEY(payInfo_ID) REFERENCES Payment_Info(payInfo_ID),
+  FOREIGN KEY(addr_ID) REFERENCES Address(addr_ID)
+);
+
+CREATE TABLE CHECK_PAYMENT (
+	CheckID INT NOT NULL PRIMARY KEY,
+  payInfo_ID INT NOT NULL,
+	checkNumber INT NOT NULL,
+	accountNumber INT NOT NULL,
+	routingNumber INT NOT NULL,
+	FOREIGN KEY(payInfo_ID) REFERENCES Payment_Info(payInfo_ID)
+);
+
+CREATE TABLE INVOICE_PAYMENT (
+	payment_ID INT NOT NULL PRIMARY KEY,
+  payInfo_ID INT NOT NULL,
+  invoice_ID INT NOT NULL,
+	paymentDate DATE NOT NULL,
+	Amount INT NOT NULL,
+	FOREIGN KEY(payInfo_ID) REFERENCES Payment_Info(payInfo_ID),
+	FOREIGN KEY(invoice_ID) REFERENCES Invoice(invoice_ID)
+);
+
+CREATE TABLE PRESCRIPTIONS (
+	prescription_ID INT NOT NULL PRIMARY KEY,
+  medRecord_ID INT NOT NULL,
+  medical_ID INT NOT NULL,
+	Dosage VARCHAR(40) NOT NULL,
+	Brand_name VARCHAR(40) NOT NULL,
+	issued_Date DATE NOT NULL,
+	expiration_Date DATE NOT NULL,
+  FOREIGN KEY(medRecord_ID) REFERENCES Medical_Record(medRecord_ID),
+  FOREIGN KEY(medical_ID) REFERENCES Medical(medical_ID)
+);
+
+CREATE TABLE ALLERGIES (
+	allergy_ID INT NOT NULL PRIMARY KEY,
+	Allergen_name VARCHAR(30) NOT NULL
+);
+
+CREATE TABLE LICENSE (
+	license_ID INT NOT NULL PRIMARY KEY,
+	Type VARCHAR(30) NOT NULL,
+	Licensure_name VARCHAR(30) NOT NULL
+);
+
+CREATE TABLE MEDICAL_LICENSE (
+	licenseIssued_ID INT NOT NULL PRIMARY KEY,
+	issue_Date DATE NOT NULL,
+	Exp_Date DATE NOT NULL,
+	stateIssued VARCHAR(30) NOT NULL,
+ 	medical_ID INT NOT NULL,
+  	license_ID INT NOT NULL,
+  	FOREIGN KEY(medical_ID) REFERENCES Medical(medical_ID),
+	FOREIGN KEY(license_ID) REFERENCES license(license_ID)
+);
+
+CREATE TABLE MEDICAL_RECORD (
+	medRecord_ID INT NOT NULL PRIMARY KEY,
+	Blood_type VARCHAR(5) NOT NULL
+);
+
+CREATE TABLE MEDICAL_DIAGNOSIS (
+	diagnosis_ID INT NOT NULL PRIMARY KEY,
+	diagnosisCode VARCHAR(20) NOT NULL,
+	diagnosisName VARCHAR(30) NOT NULL
+);
+
+CREATE TABLE MEDICALRECORD_ALLERGIES ( 
+  	allergy_ID INT NOT NULL,
+  	medRecord_ID INT NOT NULL,
+	Severity VARCHAR(30) NOT NULL,
+	FOREIGN KEY(allergy_ID) REFERENCES allergies(allergy_ID),
+	FOREIGN KEY(medRecord_ID) REFERENCES medical_record(medRecord_ID),
+  	PRIMARY KEY(allergy_ID, medRecord_ID)
+);
+
+CREATE TABLE MEDICALRECORD_DIAGNOSIS (
+	medRecord_diagnosisID INT NOT NULL,
+  	medRecord_ID INT NOT NULL,
+  	diagnosis_ID INT NOT NULL,
+	diagnosisDate DATE NOT NULL,
+	FOREIGN KEY(medRecord_ID) REFERENCES medical_record(medRecordID),
+	FOREIGN KEY(diagnosis_ID) REFERENCES medical_diagnosis(diagnosis_ID),
+  PRIMARY KEY(medRecord_diagnosisID)
+);
+
+
+CREATE TABLE PATIENT_MEDRECORD (
+  	patient_ID INT NOT NULL,
+  	medRecord_ID INT NOT NULL,
+	FOREIGN KEY(patient_ID) REFERENCES patient(patient_ID),
+	FOREIGN KEY(medRecord_ID) REFERENCES medical_record(medRecordID),
+  	PRIMARY KEY(patient_ID, medRecord_ID)
+);
+
+
+CREATE TABLE PERSON (
+	person_ID INT NOT NULL PRIMARY KEY,
+	Ssn INT NOT NULL,
+	Fname VARCHAR(255) NOT NULL,
+	Lname VARCHAR(255) NOT NULL,
+	Phone INT NOT NULL,
+	Race VARCHAR(20) NOT NULL,
+	Sex VARCHAR(1) NOT NULL,
+	Disability VARCHAR(20) NOT NULL,
+	Veteran VARCHAR(1) NOT NULL,
+	Email VARCHAR(40) NOT NULL,
+	birth_Date DATE NOT NULL,
+  	addr_ID INT NOT NULL,
+  	FOREIGN KEY(addr_ID) REFERENCES Address(addr_ID)
+);
+
+
+CREATE TABLE PATIENT (
+	patient_ID INT NOT NULL PRIMARY KEY,
+person_ID INT NOT NULL,
+payInfo_ID INT NOT NULL,
+insurance_ID INT NOT NULL,
+HIPPA_signed_date DATE NOT NULL,
+	last_xRay DATE  NOT NULL,
+  	Active boolean NOT NULL,
+	FOREIGN KEY(person_ID) REFERENCES Person(person_ID),
+	FOREIGN KEY(payInfo_ID) REFERENCES payment_info(payInfo_ID),
+	FOREIGN KEY(insurance_ID) REFERENCES insurance_plan(insurance_ID)
+);
+
+
+CREATE TABLE EMERGENCY_CONTACTS (
+  	person_ID INT NOT NULL,
+  	patient_ID INT NOT NULL,
+	FOREIGN KEY(person_ID) REFERENCES person(personID),
+	FOREIGN KEY(patient_ID) REFERENCES patient(patient_ID),
+  	PRIMARY KEY(person_ID, patient_ID)
+);
+
+CREATE TABLE EMPLOYEE (
+	emp_ID INT NOT NULL PRIMARY KEY,
+  	person_ID INT NOT NULL,
+	Salary INT NOT NULL,
+	Shift VARCHAR(30) NOT NULL,
+  	location_ID INT NOT NULL,
+	FOREIGN KEY(location_ID) REFERENCES location(location_ID),
+  	FOREIGN KEY(person_ID) REFERENCES person(person_ID)
+);
+
+
+CREATE TABLE MEDICAL (
+	medical_ID INT NOT NULL PRIMARY KEY,
+  	emp_ID INT NOT NULL,
+	FOREIGN KEY(emp_ID) REFERENCES employee(emp_ID)
+);
+
+CREATE INDEX SHIFT_HASH ON EMPLOYEE(Shift);
+
+CREATE INDEX DIAGNOSIS_DATE_TREE ON MEDICALRECORD_DIAGNOSIS(diagnosisDate);
+
+CREATE VIEW REVENUE_REPORT AS SELECT PERSON.Fname AS 'First Name', PERSON.Lname  AS 'Last Name', SUM(INVOICE.paid) AS Revenue, COUNT(*) AS Invoices FROM INVOICE
+INNER JOIN PATIENT ON PATIENT.patient_ID = INVOICE.patient_ID
+INNER JOIN PERSON ON PERSON.person_id = PATIENT.person_ID
+GROUP BY PERSON.Fname, PERSON.Lname
+ORDER BY SUM(INVOICE.paid) DESC;
+
+CREATE VIEW INSURANCE_REPORT AS SELECT INSURANCE.Name, COUNT(*) AS Invoices, SUM(INVOICE.paid) AS 'Revenue Paid',  AVG(INVOICE.Paid) AS 'Average Paid', SUM(INVOICE.charge) AS 'Revenue Charged', AVG(INVOICE.Charge) AS 'Average Charged' FROM INVOICE
+INNER JOIN PATIENT ON PATIENT.patient_ID = INVOICE.patient_ID
+INNER JOIN INSURANCE ON INSURANCE.insurance_id = PATIENT.insurance_id
+GROUP BY INSURANCE.insurance_id
+ORDER BY SUM(INVOICE.paid) DESC;

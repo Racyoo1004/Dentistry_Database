@@ -1,0 +1,72 @@
+INSERT INTO APPOINTMENT
+(appointment_Date, patient_ID, medical_ID, Cancellation, Location_ID)
+VALUES
+(DATE(), 11115, 2, 0, 1),
+(DATE(), 11116, 2, 1, 1);
+
+INSERT INTO INVOICE
+(Charge, Paid, patient_ID)
+VALUES
+(500, 250,11115),
+(2500, 2500,11116);
+
+INSERT INTO APPOINTMENT_INVOICES
+(Appointment_ID, Invoice_ID)
+VALUES
+(21, 21),
+(22, 22);
+
+
+DELETE FROM APPOINTMENT
+WHERE patient_ID=11115;
+
+DELETE FROM INVOICE
+WHERE patient_ID=11116;
+
+
+INSERT INTO ADDRESS
+(Street, Apartment, City, State, ZIP, Country)
+VALUES 
+('11th St.', NULL,'Columbus', 'Ohio', 43201, 'United States'),
+('15th St','255','Columbus','Ohio', 43201,'United States') ;
+
+INSERT INTO LOCATION
+(addr_ID, Phone, Name)
+VALUES
+(3, '646-379-0000', 'Willows Dentistry'),
+(4, '123-456-7890', 'Willows Dentistry City Office');
+
+
+
+DELETE FROM LOCATION
+WHERE addr_id IN (SELECT addr_id FROM ADDRESS WHERE apartment IS NOT NULL);
+
+DELETE FROM ADDRESS
+WHERE apartment IS NOT NULL;
+
+
+INSERT INTO PAYMENT_INFO
+(payInfo_ID, Type)
+VALUES
+(4,'cash'),
+(5,'check'),
+(6,'credit'),
+(7,'credit'),
+(8,'check');
+
+INSERT INTO CARD_PAYMENT
+(cardPaymentId,payInfo_ID, card_Number, cvv, expiration_date, name_on_card, addr_ID)
+VALUES
+(12,3, '378282246310005',123,DATE(),'VINCENT M ZHENG', 2),
+(13,3, '371449635398431',321,DATE(),'DANIEL MOGLISKY', 2);
+
+INSERT INTO CHECK_PAYMENT (CheckID,payInfo_ID,checkNumber,accountNumber,routingNumber)
+VALUES
+(11,2, 1111, 1111111111111, 111111111),
+(12,5, 1112, 1111111111112, 111111112);
+
+
+DELETE FROM PAYMENT_INFO
+WHERE Type='check';
+
+DELETE FROM CHECK_PAYMENT;
